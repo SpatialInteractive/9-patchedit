@@ -27,6 +27,15 @@ Usage
 	All arguments that take {pixels} take a comma delimitted list of zero based
 	pixel numbers or ranges.  Example: 0,1,10-20
 
+Download
+--------
+Either check the project out and build by doing "ant dist" (note you need to git submodule init && git submodule update
+after clone) -or- download prebuilt binaries from the dist folder:
+
+* https://github.com/stellaeof/9-patchedit/raw/master/dist/9pedit (posix executable)
+* https://github.com/stellaeof/9-patchedit/raw/master/dist/9pedit.jar (java executable jar)
+* https://github.com/stellaeof/9-patchedit/raw/master/dist/9pedit.exe (windows executable)
+
 
 Examples
 --------
