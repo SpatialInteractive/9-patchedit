@@ -1,0 +1,23 @@
+<project name="ninepatchedit" default="dist">
+	<target name="clean">
+		<delete dir="build"/>
+		<delete file="9pedit.jar"/>
+	</target>
+	
+	<target name="compile">
+		<mkdir dir="build/classes"/>
+		<javac srcdir="src" destdir="build/classes" encoding="UTF-8" includeantruntime="false"
+			source="1.5" target="1.5" debug="true"/>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<jar jarfile="9pedit.jar" basedir="build/classes">
+			<manifest>
+				<attribute name="Main-Class" value="net.rcode.npedit.NinePatchEdit"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="dist" depends="clean,jar"/>
+</project>
+
