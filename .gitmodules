@@ -1,0 +1,3 @@
+[submodule "jarlauncher"]
+	path = jarlauncher
+	url = git://github.com/stellaeof/jarlauncher.git

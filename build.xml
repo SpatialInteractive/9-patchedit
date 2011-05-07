@@ -1,7 +1,16 @@
 <project name="ninepatchedit" default="dist">
+	<target name="jarlauncher">
+		<ant dir="jarlauncher" target="dist"/>
+		<taskdef name="jarexec" classname="net.rcode.buildtools.JarExecTask">
+		    <classpath>
+		        <pathelement location="jarlauncher/build/dist/jarlauncher-ant.jar"/>
+		    </classpath>
+		</taskdef>
+	</target>
+	
 	<target name="clean">
 		<delete dir="build"/>
-		<delete file="9pedit.jar"/>
+		<ant dir="jarlauncher" target="clean"/>
 	</target>
 	
 	<target name="compile">
@@ -10,14 +19,25 @@
 			source="1.5" target="1.5" debug="true"/>
 	</target>
 	
-	<target name="jar" depends="compile">
-		<jar jarfile="9pedit.jar" basedir="build/classes">
+	<target name="jar" depends="jarlauncher,compile">
+		<mkdir dir="build/dist"/>
+		<jar jarfile="build/dist/9pedit.jar" basedir="build/classes">
 			<manifest>
 				<attribute name="Main-Class" value="net.rcode.npedit.NinePatchEdit"/>
 			</manifest>
 		</jar>
+		
+		<jarexec target="shell" source="build/dist/9pedit.jar" dest="build/dist/9pedit"/>
+		<chmod perm="a+x" file="build/dist/9pedit"/>
+		<jarexec target="exe" source="build/dist/9pedit.jar" dest="build/dist/9pedit.exe"/>
 	</target>
 	
-	<target name="dist" depends="clean,jar"/>
+	<target name="dist" depends="clean,jar">
+		<mkdir dir="dist"/>
+		<copy todir="dist">
+			<fileset dir="build/dist"/>
+		</copy>
+		<chmod perm="a+x" file="dist/9pedit"/>
+	</target>
 </project>
 
