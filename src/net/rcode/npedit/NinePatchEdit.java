@@ -101,17 +101,17 @@ public class NinePatchEdit {
 		for (int x=0; x<w; x++) {
 			int pixel=template.image.getRGB(x, 0);
 			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, x, 0);
+				invalidPixel(fileName, x, 0, pixel);
 			}
 			
-			if (pixel!=0) xScale.add(x);
+			if (NinePatchImage.isSetPixel(pixel)) xScale.add(x);
 			
 			pixel=template.image.getRGB(x, h-1);
 			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, x, h-1);
+				invalidPixel(fileName, x, h-1, pixel);
 			}
 			
-			if (pixel!=0) xPadding.add(x);
+			if (NinePatchImage.isSetPixel(pixel)) xPadding.add(x);
 		}
 		if (xScale.hasRanges()) commands.add(xScale);
 		if (xPadding.hasRanges()) commands.add(xPadding);
@@ -122,22 +122,23 @@ public class NinePatchEdit {
 		for (int y=0; y<h; y++) {
 			int pixel=template.image.getRGB(0, y);
 			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, 0, y);
+				invalidPixel(fileName, 0, y, pixel);
 			}
-			if (pixel!=0) yScale.add(y);
+			if (NinePatchImage.isSetPixel(pixel)) yScale.add(y);
 			
 			pixel=template.image.getRGB(w-1, y);
 			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, w-1, y);
+				invalidPixel(fileName, w-1, y, pixel);
 			}
-			if (pixel!=0) yPadding.add(y);
+			if (NinePatchImage.isSetPixel(pixel)) yPadding.add(y);
 		}
 		if (yScale.hasRanges()) commands.add(yScale);
 		if (yPadding.hasRanges()) commands.add(yPadding);
 	}
 
-	protected void invalidPixel(String fileName, int x, int y) {
-		log("WARNING: Invalid 9patch border pixel in " + fileName + " at (" + x + "," + y + ")");
+	protected void invalidPixel(String fileName, int x, int y, int pixel) {
+		log("WARNING: Invalid 9patch border pixel in " + fileName + " at (" + x + "," + y + "): #" + 
+				Integer.toHexString(pixel));
 	}
 	
 	public void processFile(File file) throws Exception {

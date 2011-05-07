@@ -96,6 +96,14 @@ public class NinePatchImage {
 	}
 
 	public static boolean validatePixel(int pixel) {
-		return pixel==0 || pixel==0xff000000;
+		int alpha=pixel >>> 24;
+		return alpha==0 || alpha==0xff;
+	}
+
+	public static boolean isSetPixel(int pixel) {
+		int alpha=pixel >>> 24;
+		if (alpha==0) return false;
+		else if (alpha==0xff) return true;
+		else return false;
 	}
 }
