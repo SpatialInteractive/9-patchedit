@@ -31,6 +31,7 @@ Usage
 Examples
 --------
 Convert a standard png to 9-patch:
+
 	athena:files stella$ 9pedit -clear raw.png 
 	--> Processing file raw.png
 	  - Image is 28x28 pixels
@@ -38,6 +39,7 @@ Convert a standard png to 9-patch:
 	  => Saving to raw.9.png
 	
 Convert a 9-patch to a standard png (remove border):
+
 	athena:files stella$ 9pedit -strip raw.9.png
 	--> Processing file raw.9.png
 	  - Image is 30x30 pixels
@@ -45,6 +47,7 @@ Convert a 9-patch to a standard png (remove border):
 	  => Saving to raw.png
 
 Programmatically set scale and padding pixels:
+
 	athena:files stella$ 9pedit -sx 14 -sy 15 -px 9-19 -py 4-25 raw.png
 	--> Processing file raw.png
 	  - Image is 28x28 pixels
@@ -55,6 +58,7 @@ Programmatically set scale and padding pixels:
 	  => Saving to raw.9.png	
 
 Copy scale and padding pixels from another 9-patch:
+
 	athena:files stella$ 9pedit -template template.9.png raw.png
 	--> Processing file raw.png
 	  - Image is 28x28 pixels
@@ -65,6 +69,7 @@ Copy scale and padding pixels from another 9-patch:
 	  => Saving to raw.9.png
 	
 Update an existing 9-patch:
+
 	athena:files stella$ 9pedit -clear -sx 14 -sy 15 raw.9.png
 	--> Processing file raw.9.png
 	  - Image is 30x30 pixels
