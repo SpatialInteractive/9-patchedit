@@ -11,6 +11,10 @@ import java.util.List;
 public abstract class RangeEditCommand extends EditCommand {
 	private List<int[]> ranges=new ArrayList<int[]>();
 	
+	public boolean hasRanges() {
+		return !ranges.isEmpty();
+	}
+	
 	public RangeEditCommand parse(String spec) {
 		String[] parts=spec.split("\\s*\\,\\s*");
 		try {
@@ -41,6 +45,7 @@ public abstract class RangeEditCommand extends EditCommand {
 	
 	@Override
 	public void performEdit(NinePatchImage npi) throws Exception {
+		npi.ensureNinePatch();
 		for (int[] range: ranges) {
 			if (range.length==1) {
 				performEdit(npi, range[0]);

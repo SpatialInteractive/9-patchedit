@@ -11,6 +11,7 @@ public class ClearEditCommand extends EditCommand {
 
 	@Override
 	public void performEdit(NinePatchImage npi) throws Exception {
+		npi.ensureNinePatch();
 		BufferedImage img=npi.image;
 		int blank=0x00000000;
 		int h=img.getHeight();

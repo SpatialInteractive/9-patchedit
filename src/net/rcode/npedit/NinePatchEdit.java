@@ -1,6 +1,8 @@
 package net.rcode.npedit;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,16 +23,36 @@ public class NinePatchEdit {
 		System.err.println(msg);
 	}
 	
-	private String nextArg(String[] args, int index) {
+	public void usage() throws IOException {
+		InputStream in=getClass().getResourceAsStream("usage.txt");
+		byte[] buffer=new byte[1024];
+		for (;;) {
+			int r=in.read(buffer);
+			if (r<0) break;
+			System.err.write(buffer, 0, r);
+		}
+		in.close();
+	}
+	
+	public void syntax(String error) throws IOException {
+		System.err.println("Syntax error: " + error);
+		usage();
+		System.exit(2);
+	}
+	
+	private String nextArg(String[] args, int index) throws IOException {
 		if (index>=args.length) {
-			log("Argument " + args[index-1] + " expects an operand.");
-			System.exit(2);
+			syntax("Argument " + args[index-1] + " expects an operand.");
 		}
 		return args[index];
 	}
 	
-	public void initFromArgs(String[] args) {
-		boolean overwrite=false;
+	public void initFromArgs(String[] args) throws IOException {
+		if (args.length==0) {
+			syntax("Expected arguments");
+		}
+		
+		//boolean overwrite=false;
 		for (int i=0; i<args.length; i++) {
 			String arg=args[i];
 			if (!arg.startsWith("-")) {
@@ -39,11 +61,15 @@ public class NinePatchEdit {
 			} else {
 				if ("-clear".equals(arg)) {
 					commands.add(new ClearEditCommand());
+				} else if ("-strip".equals(arg)) {
+					commands.add(new StripEditCommand());
 				} else if ("-out".equals(arg)) {
 					outputDirectory=new File(nextArg(args, ++i));
 					log("Will save images to " + outputDirectory);
-				} else if ("-overwrite".equals(arg)) {
-					overwrite=true;
+				//} else if ("-overwrite".equals(arg)) {
+				//	overwrite=true;
+				} else if ("-template".equals(arg)) {
+					commandsFromTemplate(nextArg(args, ++i));
 				} else if ("-sx".equals(arg)) {
 					commands.add(new SetScaleXEditCommand().parse(nextArg(args, ++i)));
 				} else if ("-sy".equals(arg)) {
@@ -53,21 +79,65 @@ public class NinePatchEdit {
 				} else if ("-py".equals(arg)) {
 					commands.add(new SetPaddingYEditCommand().parse(nextArg(args, ++i)));
 				} else {
-					log("Unrecognized command line option: " + arg);
-					System.exit(1);
+					syntax("Unrecognized command line option: " + arg);
 				}
 			}
 		}
 		
 		if (commands.size()==0) {
-			log("No commands specified.  Not doing anything!");
-			System.exit(1);
+			syntax("No commands specified.  Not doing anything!");
 		}
+	}
+	
+	public void commandsFromTemplate(String fileName) throws IOException {
+		NinePatchImage template=NinePatchImage.load(new File(fileName));
+		template.ensureNinePatch();
+		int w=template.image.getWidth();
+		int h=template.image.getHeight();
 		
-		if (!overwrite && outputDirectory==null) {
-			log("Cowardly refusing to overwrite source images.  Specify -overwrite or -out <dir>");
-			System.exit(1);
+		// X
+		SetScaleXEditCommand xScale=new SetScaleXEditCommand();
+		SetPaddingXEditCommand xPadding=new SetPaddingXEditCommand();
+		for (int x=0; x<w; x++) {
+			int pixel=template.image.getRGB(x, 0);
+			if (!NinePatchImage.validatePixel(pixel)) {
+				invalidPixel(fileName, x, 0);
+			}
+			
+			if (pixel!=0) xScale.add(x);
+			
+			pixel=template.image.getRGB(x, h-1);
+			if (!NinePatchImage.validatePixel(pixel)) {
+				invalidPixel(fileName, x, h-1);
+			}
+			
+			if (pixel!=0) xPadding.add(x);
 		}
+		if (xScale.hasRanges()) commands.add(xScale);
+		if (xPadding.hasRanges()) commands.add(xPadding);
+		
+		// Y
+		SetScaleYEditCommand yScale=new SetScaleYEditCommand();
+		SetPaddingYEditCommand yPadding=new SetPaddingYEditCommand();
+		for (int y=0; y<h; y++) {
+			int pixel=template.image.getRGB(0, y);
+			if (!NinePatchImage.validatePixel(pixel)) {
+				invalidPixel(fileName, 0, y);
+			}
+			if (pixel!=0) yScale.add(y);
+			
+			pixel=template.image.getRGB(w-1, y);
+			if (!NinePatchImage.validatePixel(pixel)) {
+				invalidPixel(fileName, w-1, y);
+			}
+			if (pixel!=0) yPadding.add(y);
+		}
+		if (yScale.hasRanges()) commands.add(yScale);
+		if (yPadding.hasRanges()) commands.add(yPadding);
+	}
+
+	protected void invalidPixel(String fileName, int x, int y) {
+		log("WARNING: Invalid 9patch border pixel in " + fileName + " at (" + x + "," + y + ")");
 	}
 	
 	public void processFile(File file) throws Exception {
@@ -79,13 +149,15 @@ public class NinePatchEdit {
 			cmd.performEdit(npi);
 		}
 		
-		File outputFile;
+		File outputFile=npi.getOutputFile();
+		/*
 		if (outputDirectory!=null) {
 			outputFile=new File(outputDirectory, file.getName());
 			outputFile.getParentFile().mkdirs();
 		} else {
 			outputFile=file;
 		}
+		*/
 		
 		log("  => Saving to " + outputFile);
 		npi.save(outputFile);

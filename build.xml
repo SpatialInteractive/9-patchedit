@@ -17,6 +17,11 @@
 		<mkdir dir="build/classes"/>
 		<javac srcdir="src" destdir="build/classes" encoding="UTF-8" includeantruntime="false"
 			source="1.5" target="1.5" debug="true"/>
+		<copy todir="build/classes">
+			<fileset dir="src">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
 	</target>
 	
 	<target name="jar" depends="jarlauncher,compile">

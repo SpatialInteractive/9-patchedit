@@ -1,0 +1,23 @@
+9pedit - Batch editing for 9-patch pngs
+
+Syntax:
+	9pedit {command options} file...
+	
+Each file is processed in order and the commands given on the command
+line are applied to each.  When all commands are applied to a file it
+is saved.  If the commands result in a 9-patch, a .9.png will be saved.
+If the commands result in a regular .png, then a .png file will be saved.
+
+Command options:
+	-clear: Reset the 9-patch border to #00000000.  Presumes that a border is present
+			Converts to .9.png if not already.
+	-strip: If is a .9.png, converts back to a standard .png, removing the border
+	-sx {pixels}: Set the given pixels on the x-scale axis (top)
+	-sy {pixels}: Set the given pixels on the y-scale axis (left)
+	-px {pixels}: Set the given pixels on the x-padding axis (bottom)
+	-py {pixels}: Set the given pixels on the y-padding axis (right)
+	-template {source.9.png}: Gets border information from another file
+	
+All arguments that take {pixels} take a comma delimitted list of zero based
+pixel numbers or ranges.  Example: 0,1,10-20
+
