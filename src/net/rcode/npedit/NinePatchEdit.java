@@ -78,6 +78,10 @@ public class NinePatchEdit {
 					commands.add(new SetPaddingXEditCommand().parse(nextArg(args, ++i)));
 				} else if ("-py".equals(arg)) {
 					commands.add(new SetPaddingYEditCommand().parse(nextArg(args, ++i)));
+				} else if ("-expand".equals(arg)) {
+					ExpandEditCommand cmd=new ExpandEditCommand();
+					cmd.parse(nextArg(args, ++i));
+					commands.add(cmd);
 				} else {
 					syntax("Unrecognized command line option: " + arg);
 				}
@@ -92,48 +96,32 @@ public class NinePatchEdit {
 	public void commandsFromTemplate(String fileName) throws IOException {
 		NinePatchImage template=NinePatchImage.load(new File(fileName));
 		template.ensureNinePatch();
-		int w=template.image.getWidth();
-		int h=template.image.getHeight();
 		
-		// X
-		SetScaleXEditCommand xScale=new SetScaleXEditCommand();
-		SetPaddingXEditCommand xPadding=new SetPaddingXEditCommand();
-		for (int x=0; x<w; x++) {
-			int pixel=template.image.getRGB(x, 0);
-			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, x, 0, pixel);
-			}
-			
-			if (NinePatchImage.isSetPixel(pixel)) xScale.add(x);
-			
-			pixel=template.image.getRGB(x, h-1);
-			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, x, h-1, pixel);
-			}
-			
-			if (NinePatchImage.isSetPixel(pixel)) xPadding.add(x);
-		}
-		if (xScale.hasRanges()) commands.add(xScale);
-		if (xPadding.hasRanges()) commands.add(xPadding);
+		int[] sxmarkers=template.getMarkers(NinePatchImage.MODE_SCALEX);
+		int[] symarkers=template.getMarkers(NinePatchImage.MODE_SCALEY);
+		int[] pxmarkers=template.getMarkers(NinePatchImage.MODE_PADDINGX);
+		int[] pymarkers=template.getMarkers(NinePatchImage.MODE_PADDINGY);
 		
-		// Y
-		SetScaleYEditCommand yScale=new SetScaleYEditCommand();
-		SetPaddingYEditCommand yPadding=new SetPaddingYEditCommand();
-		for (int y=0; y<h; y++) {
-			int pixel=template.image.getRGB(0, y);
-			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, 0, y, pixel);
-			}
-			if (NinePatchImage.isSetPixel(pixel)) yScale.add(y);
-			
-			pixel=template.image.getRGB(w-1, y);
-			if (!NinePatchImage.validatePixel(pixel)) {
-				invalidPixel(fileName, w-1, y, pixel);
-			}
-			if (NinePatchImage.isSetPixel(pixel)) yPadding.add(y);
+		if (sxmarkers.length>0) {
+			SetScaleXEditCommand cmd=new SetScaleXEditCommand();
+			cmd.add(sxmarkers);
+			commands.add(cmd);
 		}
-		if (yScale.hasRanges()) commands.add(yScale);
-		if (yPadding.hasRanges()) commands.add(yPadding);
+		if (symarkers.length>0) {
+			SetScaleYEditCommand cmd=new SetScaleYEditCommand();
+			cmd.add(symarkers);
+			commands.add(cmd);
+		}
+		if (pxmarkers.length>0) {
+			SetPaddingXEditCommand cmd=new SetPaddingXEditCommand();
+			cmd.add(pxmarkers);
+			commands.add(cmd);
+		}
+		if (pymarkers.length>0) {
+			SetPaddingYEditCommand cmd=new SetPaddingYEditCommand();
+			cmd.add(pymarkers);
+			commands.add(cmd);
+		}
 	}
 
 	protected void invalidPixel(String fileName, int x, int y, int pixel) {
@@ -151,14 +139,10 @@ public class NinePatchEdit {
 		}
 		
 		File outputFile=npi.getOutputFile();
-		/*
 		if (outputDirectory!=null) {
-			outputFile=new File(outputDirectory, file.getName());
+			outputFile=new File(outputDirectory, outputFile.getName());
 			outputFile.getParentFile().mkdirs();
-		} else {
-			outputFile=file;
 		}
-		*/
 		
 		log("  => Saving to " + outputFile);
 		npi.save(outputFile);

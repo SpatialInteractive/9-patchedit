@@ -15,6 +15,7 @@ public abstract class RangeEditCommand extends EditCommand {
 		return !ranges.isEmpty();
 	}
 	
+	
 	public RangeEditCommand parse(String spec) {
 		String[] parts=spec.split("\\s*\\,\\s*");
 		try {
@@ -41,6 +42,12 @@ public abstract class RangeEditCommand extends EditCommand {
 	
 	public void add(int start, int end) {
 		ranges.add(new int[] { start, end });
+	}
+	
+	public void add(int... points) {
+		for (int point: points) {
+			ranges.add(new int[] { point });
+		}
 	}
 	
 	@Override
