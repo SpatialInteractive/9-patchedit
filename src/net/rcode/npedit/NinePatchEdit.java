@@ -14,7 +14,7 @@ import java.util.List;
 public class NinePatchEdit {
 	List<File> files=new ArrayList<File>();
 	List<EditCommand> commands=new ArrayList<EditCommand>();
-	File outputDirectory=new File("out");
+	File outputDirectory=null;
 	
 	public NinePatchEdit() {
 	}
