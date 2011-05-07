@@ -87,4 +87,13 @@ Update an existing 9-patch:
 	  + Set y scale points 15
 	  => Saving to raw.9.png	
 	
-	
+Expand a 9-patches to new sizes and save as standard pngs (I did this as a shortcut to building a bigger combined background image in the image editor):
+
+	athena:btn stella$ 9pedit -expand 34x34 -out ../session -strip nav.9.png
+	Will save images to ../session
+	--> Processing file nav.9.png
+	  - Image is 22x21 pixels
+	  + Expand 9-patch to 34x34
+	  + Strip 9-patch border and convert to standard png
+	  => Saving to ../session/nav.png
+
