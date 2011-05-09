@@ -6,5 +6,5 @@ package net.rcode.npedit;
  *
  */
 public abstract class EditCommand {
-	public abstract void performEdit(NinePatchImage npi) throws Exception;
+	public abstract void performEdit(EditContext context, NinePatchImage npi) throws Exception;
 }

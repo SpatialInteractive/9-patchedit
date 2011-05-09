@@ -11,7 +11,7 @@ import java.util.List;
  * @author stella
  *
  */
-public class NinePatchEdit {
+public class NinePatchEdit implements EditContext {
 	List<File> files=new ArrayList<File>();
 	List<EditCommand> commands=new ArrayList<EditCommand>();
 	File outputDirectory=null;
@@ -21,6 +21,11 @@ public class NinePatchEdit {
 	
 	public void log(String msg) {
 		System.err.println(msg);
+	}
+	
+	@Override
+	public void logCommandDetail(String msg) {
+		log("  - " + msg);
 	}
 	
 	public void usage() throws IOException {
@@ -82,6 +87,8 @@ public class NinePatchEdit {
 					ExpandEditCommand cmd=new ExpandEditCommand();
 					cmd.parse(nextArg(args, ++i));
 					commands.add(cmd);
+				} else if ("-spec".equals(arg)) {
+					commands.add(new SpecEditCommand());
 				} else {
 					syntax("Unrecognized command line option: " + arg);
 				}
@@ -134,8 +141,7 @@ public class NinePatchEdit {
 		NinePatchImage npi=NinePatchImage.load(file);
 		log("  - Image is " + npi.image.getWidth() + "x" + npi.image.getHeight() + " pixels");
 		for (EditCommand cmd: commands) {
-			log("  + " + cmd);
-			cmd.performEdit(npi);
+			applyCommand(npi, cmd);
 		}
 		
 		File outputFile=npi.getOutputFile();
@@ -146,6 +152,13 @@ public class NinePatchEdit {
 		
 		log("  => Saving to " + outputFile);
 		npi.save(outputFile);
+	}
+
+	@Override
+	public void applyCommand(NinePatchImage npi, EditCommand cmd)
+			throws Exception {
+		log("  + " + cmd);
+		cmd.performEdit(this, npi);
 	}
 	
 	public void processFiles() throws Exception {

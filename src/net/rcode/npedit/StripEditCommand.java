@@ -3,7 +3,7 @@ package net.rcode.npedit;
 public class StripEditCommand extends EditCommand {
 
 	@Override
-	public void performEdit(NinePatchImage npi) throws Exception {
+	public void performEdit(EditContext context, NinePatchImage npi) throws Exception {
 		npi.ensurePlain();
 	}
 

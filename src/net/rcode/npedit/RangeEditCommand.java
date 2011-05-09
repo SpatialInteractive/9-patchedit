@@ -51,7 +51,7 @@ public abstract class RangeEditCommand extends EditCommand {
 	}
 	
 	@Override
-	public void performEdit(NinePatchImage npi) throws Exception {
+	public void performEdit(EditContext context, NinePatchImage npi) throws Exception {
 		npi.ensureNinePatch();
 		for (int[] range: ranges) {
 			if (range.length==1) {

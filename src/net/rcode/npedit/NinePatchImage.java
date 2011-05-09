@@ -25,6 +25,7 @@ public class NinePatchImage {
 	public static final String NINE_PATCH_SUFFIX=".9.png";
 	public static final String PNG_SUFFIX=".png";
 	
+	public File source;
 	public boolean isNinePatch;
 	public File plainFile;
 	public File ninePatchFile;
@@ -57,6 +58,8 @@ public class NinePatchImage {
 	
 	public static NinePatchImage load(File source) throws IOException {
 		NinePatchImage ret=new NinePatchImage();
+		ret.source=source;
+		
 		ImageReader reader=ImageUtil.getPngReader();	
 		ImageInputStream in=ImageIO.createImageInputStream(source);
 		reader.setInput(in);
